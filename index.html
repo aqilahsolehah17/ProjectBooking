@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Women's Booking Helper</title>
+<style>
+  :root{
+    --bg:#FDF7F2;
+    --card:#FFFFFF;
+    --ink:#2B2233;
+    --muted:#7A6E85;
+    --lilac:#B79CF6;
+    --lilac-soft:#EFE8FF;
+    --peach:#FF9E7D;
+    --peach-soft:#FFE9E0;
+    --mint:#5ECCB4;
+    --mint-soft:#E1F7F1;
+    --border:#EDE4EA;
+    --radius:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI', 'Trebuchet MS', system-ui, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.5;
+    padding:32px 16px 64px;
+  }
+  .wrap{max-width:680px;margin:0 auto;}
+
+  header{margin-bottom:28px;}
+  .badge{
+    display:inline-block;
+    background:var(--lilac-soft);
+    color:#6A46C9;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:5px 12px;
+    border-radius:999px;
+    margin-bottom:12px;
+  }
+  h1{font-size:30px;font-weight:800;letter-spacing:-.02em;}
+  .sub{color:var(--muted);margin-top:6px;font-size:15px;}
+
+  section{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:24px;
+    margin-bottom:20px;
+    box-shadow:0 4px 16px rgba(60,40,80,.05);
+  }
+  .step{
+    display:flex;align-items:center;gap:10px;margin-bottom:4px;
+  }
+  .step-num{
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:13px;font-weight:700;color:#fff;
+    flex-shrink:0;
+  }
+  .s1 .step-num{background:var(--lilac);}
+  .s2 .step-num{background:var(--peach);}
+  .s3 .step-num{background:var(--mint);}
+  h2{font-size:18px;font-weight:700;}
+  .hint{color:var(--muted);font-size:13px;margin-bottom:16px;margin-left:36px;}
+
+  /* Service cards */
+  .cards{display:flex;flex-direction:column;gap:12px;}
+  .card{
+    display:flex;align-items:center;gap:14px;
+    border:2px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s, transform .1s;
+    text-align:left;width:100%;
+    font-family:inherit;
+    background:#fff;
+  }
+  .card:hover{transform:translateY(-1px);}
+  .card:focus-visible{outline:2px solid var(--lilac);outline-offset:2px;}
+  .card .icon{
+    width:44px;height:44px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:22px;flex-shrink:0;
+  }
+  .card .info{flex:1;}
+  .card .name{font-weight:700;font-size:15px;}
+  .card .desc{color:var(--muted);font-size:13px;}
+  .card .tick{
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid var(--border);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-size:12px;font-weight:800;
+  }
+  .card.selected .tick{background:var(--ink);border-color:var(--ink);}
+  .card[data-service="emcee"]{--c:var(--lilac);--cs:var(--lilac-soft);}
+  .card[data-service="creator"]{--c:var(--peach);--cs:var(--peach-soft);}
+  .card[data-service="driver"]{--c:var(--mint);--cs:var(--mint-soft);}
+  .card .icon{background:var(--cs);}
+  .card.selected{border-color:var(--c);background:var(--cs);}
+
+  /* Form */
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .field{display:flex;flex-direction:column;gap:6px;}
+  .field.full{grid-column:1 / -1;}
+  label{font-size:13px;font-weight:600;color:var(--ink);}
+  input, textarea{
+    font-family:inherit;font-size:14px;color:var(--ink);
+    border:2px solid var(--border);border-radius:10px;
+    padding:10px 12px;background:#fff;
+    transition:border-color .15s;
+    width:100%;
+  }
+  input:focus, textarea:focus{outline:none;border-color:var(--peach);}
+  textarea{resize:vertical;min-height:64px;}
+
+  /* Summary */
+  .summary-list{display:flex;flex-direction:column;gap:0;}
+  .row{
+    display:flex;justify-content:space-between;gap:16px;
+    padding:11px 0;border-bottom:1px dashed var(--border);
+    font-size:14px;
+  }
+  .row:last-child{border-bottom:none;}
+  .row .k{color:var(--muted);font-weight:600;flex-shrink:0;}
+  .row .v{text-align:right;word-break:break-word;}
+  .empty{color:var(--muted);font-style:italic;}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 12px;border-radius:999px;
+    font-size:13px;font-weight:700;
+  }
+  .note{
+    margin-top:14px;background:var(--mint-soft);
+    border-radius:10px;padding:10px 14px;
+    font-size:13px;color:#1F7A66;
+  }
+  footer{text-align:center;color:var(--muted);font-size:12px;margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge">Women's Booking Helper</span>
+    <h1>Book a helping hand 💜</h1>
+    <p class="sub">Pick a service, fill in your details, and review everything on one page. Nothing is saved — this is a sample demo.</p>
+  </header>
+
+  <!-- 1. Service choice -->
+  <section class="s1">
+    <div class="step"><span class="step-num">1</span><h2>Choose your service</h2></div>
+    <p class="hint">Tap a card to select what you'd like to book.</p>
+    <div class="cards" id="cards">
+      <button class="card" type="button" data-service="emcee">
+        <span class="icon">🎤</span>
+        <span class="info">
+          <span class="name">Wedding Emcee</span><br>
+          <span class="desc">Warm, bilingual host for your big day (e.g. KL reception dinner)</span>
+        </span>
+        <span class="tick">✓</span>
+      </button>
+      <button class="card" type="button" data-service="creator">
+        <span class="icon">📸</span>
+        <span class="info">
+          <span class="name">Wedding Content Creator</span><br>
+          <span class="desc">Captures reels &amp; candid moments (e.g. Penang church + banquet)</span>
+        </span>
+        <span class="tick">✓</span>
+      </button>
+      <button class="card" type="button" data-service="driver">
+        <span class="icon">🚗</span>
+        <span class="info">
+          <span class="name">Lady Driver for Chores</span><br>
+          <span class="desc">Errands &amp; school runs by a trusted female driver (e.g. around Shah Alam)</span>
+        </span>
+        <span class="tick">✓</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 2. Booking details -->
+  <section class="s2">
+    <div class="step"><span class="step-num">2</span><h2>Booking details</h2></div>
+    <p class="hint">Type your details — the summary below updates right away.</p>
+    <div class="grid">
+      <div class="field full">
+        <label for="f-name">Your name</label>
+        <input id="f-name" type="text" placeholder="e.g. Nurul Aisyah" value="Nurul Aisyah">
+      </div>
+      <div class="field">
+        <label for="f-date">Date</label>
+        <input id="f-date" type="date" value="2026-12-12">
+      </div>
+      <div class="field">
+        <label for="f-time">Time</label>
+        <input id="f-time" type="time" value="18:00">
+      </div>
+      <div class="field full">
+        <label for="f-location">Location</label>
+        <input id="f-location" type="text" placeholder="e.g. Shah Alam, Selangor" value="Shah Alam, Selangor">
+      </div>
+      <div class="field full">
+        <label for="f-notes">Notes</label>
+        <textarea id="f-notes" placeholder="Anything the helper should know…">Event is at Section 7 community hall. Dresscode is pastel.</textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Booking summary -->
+  <section class="s3">
+    <div class="step"><span class="step-num">3</span><h2>Booking summary</h2></div>
+    <p class="hint">Check everything looks right before you finish.</p>
+    <div class="summary-list">
+      <div class="row">
+        <span class="k">Service</span>
+        <span class="v" id="sum-service"><span class="empty">Not selected yet — tap a card above</span></span>
+      </div>
+      <div class="row"><span class="k">Name</span><span class="v" id="sum-name">Nurul Aisyah</span></div>
+      <div class="row"><span class="k">Date</span><span class="v" id="sum-date">12 Dec 2026</span></div>
+      <div class="row"><span class="k">Time</span><span class="v" id="sum-time">6:00 PM</span></div>
+      <div class="row"><span class="k">Location</span><span class="v" id="sum-location">Shah Alam, Selangor</span></div>
+      <div class="row"><span class="k">Notes</span><span class="v" id="sum-notes">Event is at Section 7 community hall. Dresscode is pastel.</span></div>
+    </div>
+    <div class="note">✅ This is a sample request only — nothing is sent or saved.</div>
+  </section>
+
+  <footer>Women's Booking Helper · demo page · all data is made up</footer>
+</div>
+
+<script>
+  const SERVICES = {
+    emcee:   {name:'Wedding Emcee',              color:'#B79CF6', soft:'#EFE8FF'},
+    creator: {name:'Wedding Content Creator',    color:'#FF9E7D', soft:'#FFE9E0'},
+    driver:  {name:'Lady Driver for Chores',     color:'#5ECCB4', soft:'#E1F7F1'}
+  };
+  let selectedService = 'emcee'; // starts selected so the app never opens blank
+
+  const cards = document.querySelectorAll('.card');
+  const sumService = document.getElementById('sum-service');
+  const fields = {
+    name: document.getElementById('f-name'),
+    date: document.getElementById('f-date'),
+    time: document.getElementById('f-time'),
+    location: document.getElementById('f-location'),
+    notes: document.getElementById('f-notes')
+  };
+  const sum = {
+    name: document.getElementById('sum-name'),
+    date: document.getElementById('sum-date'),
+    time: document.getElementById('sum-time'),
+    location: document.getElementById('sum-location'),
+    notes: document.getElementById('sum-notes')
+  };
+
+  function fmtDate(v){
+    if(!v) return null;
+    const d = new Date(v + 'T00:00:00');
+    if(isNaN(d)) return v;
+    return d.toLocaleDateString('en-MY', {day:'numeric', month:'short', year:'numeric'});
+  }
+  function fmtTime(v){
+    if(!v) return null;
+    const [h,m] = v.split(':').map(Number);
+    const ap = h >= 12 ? 'PM' : 'AM';
+    const hh = ((h + 11) % 12) + 1;
+    return hh + ':' + String(m).padStart(2,'0') + ' ' + ap;
+  }
+  function orEmpty(v){ return v && v.trim() ? v : null; }
+
+  function render(){
+    // service pill
+    if(selectedService){
+      const s = SERVICES[selectedService];
+      sumService.innerHTML = '<span class="pill" style="background:'+s.soft+';color:'+s.color+'">'+s.name+'</span>';
+    } else {
+      sumService.innerHTML = '<span class="empty">Not selected yet — tap a card above</span>';
+    }
+    // fields
+    const vals = {
+      name: orEmpty(fields.name.value),
+      date: fmtDate(fields.date.value),
+      time: fmtTime(fields.time.value),
+      location: orEmpty(fields.location.value),
+      notes: orEmpty(fields.notes.value)
+    };
+    for(const k in sum){
+      sum[k].innerHTML = vals[k] ? escapeHtml(vals[k]) : '<span class="empty">—</span>';
+    }
+  }
+  function escapeHtml(t){
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      cards.forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      selectedService = card.dataset.service;
+      render();
+    });
+  });
+
+  Object.values(fields).forEach(el => {
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // initial paint
+  document.querySelector('.card[data-service="emcee"]').classList.add('selected');
+  render();
+</script>
+</body>
+</html>
